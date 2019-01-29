@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../ImportExcel-master/.idea/ImportExcel-master.iml" filepath="$PROJECT_DIR$/../ImportExcel-master/.idea/ImportExcel-master.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../NancyAdmin/.idea/NancyAdmin.iml" filepath="$PROJECT_DIR$/../NancyAdmin/.idea/NancyAdmin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/SideAdmin.iml" filepath="$PROJECT_DIR$/.idea/SideAdmin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../checkonline/.idea/checkonline.iml" filepath="$PROJECT_DIR$/../checkonline/.idea/checkonline.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../gtonline/.idea/gtonline.iml" filepath="$PROJECT_DIR$/../gtonline/.idea/gtonline.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../wxjs/.idea/wxjs.iml" filepath="$PROJECT_DIR$/../wxjs/.idea/wxjs.iml" />
+    </modules>
+  </component>
+</project>

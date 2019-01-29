@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="assets/js/vue/vue-resource.js"></script>
+    <script src="https://cdn.staticfile.org/vue/2.2.2/vue.min.js"></script>
+</head>
+<body>
+<div class="container" id="box">
+    <div class="panel panel-primary">
+        <div class="panel-heading">请添加</div>
+        <div class="panel-body">
+            <form>
+                <div class="form-group">
+                    <label for="exampleInputEmail1">姓名：</label>
+                    <input v-model="username" type="text" name="username " class="form-control" id="exampleInputEmail1" >
+                </div>
+                <div class="form-group">
+                    <label for="exampleInputPassword1">学号：</label>
+                    <input v-model="id" type="text" name="id" class="form-control" id="exampleInputPassword1">
+                </div>
+                <div class="col-lg-offset-5 col-md-7">
+                    <button type="button" @click="add" class="btn btn-primary">添加</button>    
+                    <button type="button" class="btn btn-primary">重置</button>
+                </div>
+
+            </form>
+        </div>
+        <br/>
+        <table class="table table-bordered table-hover">
+            <caption class="h3 text-info">学生信息表</caption>
+            <tr class="text-danger">
+                <th class="text-center">序号</th>
+                <th class="text-center">名字</th>
+                <th class="text-center">学号</th>
+                <th class="text-center">操作</th>
+            </tr>
+            <tr class="text-center" v-for="(item,index) in subArr">
+                <td>{{ index+pageNo*record+1 }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.id }}</td>
+                <td>
+                    <button @click="now=index+pageNo*record" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#layer">删除</button>    
+                    <button @click="edit(index+pageNo*record)" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#edit">编辑</button>
+                </td>
+            </tr>
+            <tr v-show="arr.length!=0">
+                <td colspan="4" class="text-center">
+                    <button @click="delAll=true" class="btn btn-danger btn-sm" data-toggle="modal" data-target="#layer">删除全部</button>
+                </td>
+            </tr>
+            <tr v-show="arr.length==0">
+                <td colspan="4" class="text-center text-muted">
+                    <p>暂无数据....</p>
+                </td>
+            </tr>
+        </table>
+        <div class="text-center">
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li v-for="i in pagearr" track-by="index" :class="pageNo==(i-1)?'active':''">
+                        <a href="#" @click="pageNo=i-1">{{ i }}</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <div role="dialog" class="modal fade bs-example-modal-sm" id="layer">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>×</span>
+                    </button>
+                    <h4 class="modal-title">{{ delAll?'确认全部删除么？':'确认删除么？'}} </h4>
+                </div>
+                <div class="modal-body text-right">
+                    <button data-dismiss="modal" class="btn btn-primary btn-sm" @click="delAll=false">取消</button>
+                    <button data-dismiss="modal" class="btn btn-danger btn-sm" @click="del()">确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div role="dialog" class="modal fade bs-example-modal-sm" id="edit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>×</span>
+                    </button>
+                    <h4 class="modal-title">请编辑</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            姓名：<input v-model="selectedlist.name" type="text" name="username " class="form-control" id="username">
+                            学号：<input v-model="selectedlist.id" type="text" name="id" class="form-control" id="id">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer text-right">
+                    <button data-dismiss="modal" class="btn btn-primary btn-sm" @click="selectedlist=[]">取消</button>
+                    <button data-dismiss="modal" class="btn btn-danger btn-sm" @click="edit_true()">编辑</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    window.onload=function () {
+        new Vue({
+            el:"#box",
+            data:{
+                username:"",
+                id:"",
+                arr:[],
+                now:-1,
+                delAll:false,
+                selectedlist:[],//暂存被选中进行编辑的数据
+                selectedindex:-1,//记录被选中的index
+                pageNo:0,
+                record:3,
+                pagearr:[],
+
+            },
+            methods:{
+                add(){
+                    if(this.username=="" || this.id==""){
+                        alert("请输入姓名或学号")
+                    }else{
+                        this.arr.unshift({name:this.username,id:this.id});
+                        this.username="";
+                        this.id="";
+                        this.page();
+                    }
+                },
+                del(){
+                    if(this.delAll){
+                        this.arr=[];
+                        this.delAll=false;
+                        this.page();
+                    }else{
+                        this.arr.splice(this.now,1);
+                        if((this.arr.length+1)%this.record==1){
+                            this.pageNo--;
+                        }   //当最后一页的最后一条数据被删除时，也要改变当前页面
+                        this.page();
+                    }
+                },
+                edit(index){
+                    this.selectedlist=[];
+                    this.selectedindex=index;
+                    this.selectedlist=JSON.parse( JSON.stringify(this.arr[index]) );// 深度拷贝,先转换为字符串，然后再转换
+                },
+                edit_true(){
+                    this.arr[this.selectedindex].id=this.selectedlist.id;
+                    this.arr[this.selectedindex].name=this.selectedlist.name;
+                },
+                page(){
+                    var pageMax=Math.ceil(this.arr.length/this.record);
+                    this.pagearr=[];
+                    for(let i=1;i<=pageMax;i++){
+                        this.pagearr.push(i);
+                    }
+                },
+            },
+            computed:{
+                subArr(){
+                    return this.arr.slice(this.pageNo*this.record,(this.pageNo+1)*this.record);
+                }
+            },
+            ready(){
+                this.arr.unshift({name:'aaa',id:111});
+                this.arr.unshift({name:'bbb',id:222});
+                this.arr.unshift({name:'ccc',id:333});
+                this.arr.unshift({name:'ddd',id:444});
+                this.arr.unshift({name:'eee',id:555});
+                this.arr.unshift({name:'fff',id:666});
+                this.arr.unshift({name:'ggg',id:777});
+                this.arr.unshift({name:'hhh',id:888});
+                this.arr.unshift({name:'iii',id:999});
+                this.page();
+            }
+        });
+    };
+
+</script>
+
+</body>
+</html>
